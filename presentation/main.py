@@ -15,7 +15,9 @@ def display_menu():
     print("2. Display all records")
     print("3. Search by province")
     print("4. Save records to new CSV")
-    print("5. Exit")
+    print("5. Add a new record")
+    print("6. Exit")
+
 
 def main():
     manager = RecordManager()
@@ -44,7 +46,27 @@ def main():
             save_records_to_csv(save_path, manager.get_all_records())
             print(f"Records saved to {save_path}")
         elif choice == "5":
+            sample_type = input("Sample Type: ")
+            type_ = input("Type: ")
+            start_date = input("Start Date: ")
+            stop_date = input("Stop Date: ")
+            station_name = input("Station Name: ")
+            province = input("Province: ")
+            sr90_activity = input("Sr90 Activity: ")
+            sr90_error = input("Sr90 Error: ")
+            sr90_calcium_activity = input("Sr90 Calcium Activity: ")
+
+            from model.record import Record
+            new_record = Record(
+                sample_type, type_, start_date, stop_date,
+                station_name, province, sr90_activity,
+                sr90_error, sr90_calcium_activity
+            )
+            manager.add_record(new_record)
+            print("New record added.")
+        elif choice == "6":
             break
+
         else:
             print("Invalid choice. Try again.")
 
