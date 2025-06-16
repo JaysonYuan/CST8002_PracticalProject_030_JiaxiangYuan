@@ -1,6 +1,8 @@
 """
 tests/test_record_manager.py
 Unit tests for the RecordManager class.
+
+Program by Jiaxiang Yuan
 """
 
 import unittest
