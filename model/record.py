@@ -2,7 +2,7 @@
 model/record.py
 Data model for Sr-90 dataset.
 
-Program by Jayson YUAN
+Program by Jiaxiang Yuan
 """
 
 class Record:
