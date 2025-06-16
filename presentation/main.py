@@ -6,10 +6,11 @@ Program by Jiaxiang Yuan
 """
 
 from business.record_manager import RecordManager
-from persistence.file_handler import load_records_from_csv, save_records_to_csv
+from persistence.file_handler import load_records_from_csv, save_records_to_csv, generate_uuid_filename
 
 def display_menu():
     print("\n=== Sr-90 Milk Records System ===")
+    print("Program by Jiaxiang Yuan")
     print("1. Load records from CSV")
     print("2. Display all records")
     print("3. Search by province")
@@ -30,6 +31,8 @@ def main():
         elif choice == "2":
             for i, r in enumerate(manager.get_all_records()):
                 print(f"[{i}] {r}")
+                if (i + 1) % 10 == 0:
+                    print("Program by Jiaxiang Yuan")
         elif choice == "3":
             prov = input("Enter province abbreviation (e.g., ON): ")
             results = manager.search_by_province(prov)
@@ -37,9 +40,9 @@ def main():
             for r in results:
                 print(r)
         elif choice == "4":
-            save_path = input("Enter file name to save to (e.g., output/filtered.csv): ")
+            save_path = generate_uuid_filename()
             save_records_to_csv(save_path, manager.get_all_records())
-            print("Records saved.")
+            print(f"Records saved to {save_path}")
         elif choice == "5":
             break
         else:
