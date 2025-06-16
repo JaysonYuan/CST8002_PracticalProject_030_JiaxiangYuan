@@ -1,6 +1,8 @@
 """
 business/record_manager.py
 Handles business logic for Sr-90 Record objects.
+
+Program by Jiaxiang Yuan
 """
 
 from model.record import Record
