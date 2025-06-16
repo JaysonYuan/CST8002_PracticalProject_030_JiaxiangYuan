@@ -1,55 +1,71 @@
 """
 persistence/file_handler.py
-Handles reading and writing CSV data for Sr-90 dataset.
+Handles file input/output for Sr-90 records.
 
 Program by Jiaxiang Yuan
 """
 
 import csv
+import uuid
 from model.record import Record
 
-CSV_COLUMNS = [
-    "Sample Type/ Type d'échantillon", "Type", "Start Date/ Date de Début",
-    "Stop Date/ Date de Fin", "Station Name/ Nom de Station", "Province",
-    "Sr90 Activity/ Activité (Bq/L)", "Sr90 Error/ Erreur (Bq/L)",
-    "Sr90 Activity/Calcium / Activité/Calcium  (Bq/g)"
-]
-
-def load_records_from_csv(file_path: str):
+def load_records_from_csv(file_path, max_records=100):
     records = []
-    with open(file_path, newline='', encoding='ISO-8859-1') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            try:
+    try:
+        with open(file_path, newline='', encoding='utf-8') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for i, row in enumerate(reader):
+                if i >= max_records:
+                    break
                 record = Record(
-                    row[CSV_COLUMNS[0]],
-                    row[CSV_COLUMNS[1]],
-                    row[CSV_COLUMNS[2]],
-                    row[CSV_COLUMNS[3]],
-                    row[CSV_COLUMNS[4]],
-                    row[CSV_COLUMNS[5]],
-                    row[CSV_COLUMNS[6]],
-                    row[CSV_COLUMNS[7]],
-                    row[CSV_COLUMNS[8]]
+                    sample_type=row['Sample Type/ Type d\'échantillon'],
+                    type_=row['Type'],
+                    start_date=row['Start Date/ Date de Début'],
+                    stop_date=row['Stop Date/ Date de Fin'],
+                    station_name=row['Station Name/ Nom de Station'],
+                    province=row['Province'],
+                    sr90_activity=row['Sr90 Activity/ Activité (Bq/L)'],
+                    sr90_error=row['Sr90 Error'],  
+                    sr90_calcium_activity=row['Sr90 Calcium Activity'] 
                 )
                 records.append(record)
-            except Exception as e:
-                print(f"Error parsing row: {e}")
+    except FileNotFoundError:
+        print(f"File {file_path} not found.")
+    except Exception as e:
+        print(f"Error reading file: {e}")
     return records
 
-def save_records_to_csv(file_path: str, records):
-    with open(file_path, mode='w', newline='', encoding='utf-8') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(CSV_COLUMNS)
-        for record in records:
-            writer.writerow([
-                record.sample_type,
-                record.type_,
-                record.start_date,
-                record.stop_date,
-                record.station_name,
-                record.province,
-                record.sr90_activity,
-                record.sr90_error,
-                record.sr90_calcium_activity
-            ])
+def save_records_to_csv(file_path, records):
+    try:
+        with open(file_path, 'w', newline='', encoding='utf-8') as csvfile:
+            fieldnames = [
+                'Sample Type/ Type d\'échantillon',
+                'Type',
+                'Start Date/ Date de Début',
+                'Stop Date/ Date de Fin',
+                'Station Name/ Nom de Station',
+                'Province',
+                'Sr90 Activity/ Activité (Bq/L)',
+                'Sr90 Error',
+                'Sr90 Calcium Activity'
+            ]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            for r in records:
+                writer.writerow({
+                    'Sample Type/ Type d\'échantillon': r.sample_type,
+                    'Type': r.type_,
+                    'Start Date/ Date de Début': r.start_date,
+                    'Stop Date/ Date de Fin': r.stop_date,
+                    'Station Name/ Nom de Station': r.station_name,
+                    'Province': r.province,
+                    'Sr90 Activity/ Activité (Bq/L)': r.sr90_activity,
+                    'Sr90 Error': r.sr90_error,
+                    'Sr90 Calcium Activity': r.sr90_calcium_activity
+                })
+        print(f"Saved {len(records)} records to {file_path}")
+    except Exception as e:
+        print(f"Error saving file: {e}")
+
+def generate_uuid_filename():
+    return f"output_{uuid.uuid4()}.csv"
