@@ -1,11 +1,14 @@
 """
 model/record.py
-Data model for Sr-90 dataset.
+Defines the Record data model for Sr-90 Milk dataset.
 
 Program by Jiaxiang Yuan
 """
 
 class Record:
+    """
+    Data Transfer Object for Sr-90 milk record.
+    """
     def __init__(self, sample_type, type_, start_date, stop_date,
                  station_name, province, sr90_activity,
                  sr90_error, sr90_calcium_activity):
@@ -20,10 +23,11 @@ class Record:
         self.sr90_calcium_activity = sr90_calcium_activity
 
     def __str__(self):
-        return (
-            f"Sample Type: {self.sample_type}, Type: {self.type_}, "
-            f"Start: {self.start_date}, Stop: {self.stop_date}, "
-            f"Station: {self.station_name}, Province: {self.province}, "
-            f"Sr-90 Activity: {self.sr90_activity}, Error: {self.sr90_error}, "
-            f"Calcium Activity: {self.sr90_calcium_activity}"
-        )
+        """
+        String representation of a Record object for display.
+        """
+        return (f"Sample Type: {self.sample_type}, Type: {self.type_}, "
+                f"Start: {self.start_date}, Stop: {self.stop_date}, "
+                f"Station: {self.station_name}, Province: {self.province}, "
+                f"Sr-90 Activity: {self.sr90_activity}, Error: {self.sr90_error}, "
+                f"Calcium Activity: {self.sr90_calcium_activity}")

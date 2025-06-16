@@ -1,6 +1,6 @@
 """
 business/record_manager.py
-Handles business logic for Sr-90 Record objects.
+Business logic for managing Sr-90 milk records in-memory.
 
 Program by Jiaxiang Yuan
 """
@@ -8,26 +8,54 @@ Program by Jiaxiang Yuan
 from model.record import Record
 
 class RecordManager:
+    """
+    Manages a collection (list) of Record objects with CRUD operations.
+    """
     def __init__(self):
         self.records = []
 
-    def add_record(self, record: Record):
+    def load_records(self, records_list):
+        """
+        Replace current records with a new list of Record objects.
+        """
+        self.records = records_list
+
+    def get_all_records(self):
+        """
+        Return the list of all records.
+        """
+        return self.records
+
+    def find_records_by_province(self, province):
+        """
+        Find and return all records matching a given province (case-insensitive).
+        """
+        return [r for r in self.records if r.province.lower() == province.lower()]
+
+    def add_record(self, record):
+        """
+        Add a new Record object to the collection.
+        """
         self.records.append(record)
 
-    def remove_record(self, index: int):
-        if 0 <= index < len(self.records):
-            del self.records[index]
-            return True
-        return False
-
-    def update_record(self, index: int, new_record: Record):
+    def edit_record(self, index, new_record):
+        """
+        Replace the Record at given index with new_record.
+        Returns True if successful, False if index out of range.
+        """
         if 0 <= index < len(self.records):
             self.records[index] = new_record
             return True
-        return False
+        else:
+            return False
 
-    def get_all_records(self):
-        return self.records
-
-    def search_by_province(self, province: str):
-        return [r for r in self.records if r.province.lower() == province.lower()]
+    def delete_record(self, index):
+        """
+        Delete the Record at given index.
+        Returns True if successful, False if index out of range.
+        """
+        if 0 <= index < len(self.records):
+            del self.records[index]
+            return True
+        else:
+            return False
