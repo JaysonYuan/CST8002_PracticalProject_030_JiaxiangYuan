@@ -17,7 +17,8 @@ def display_menu():
     print("4. Save records to new CSV")
     print("5. Add a new record")
     print("6. Edit a record")
-    print("7. Exit")
+    print("7. Delete a record")
+    print("8. Exit")
 
 
 
@@ -94,6 +95,12 @@ def main():
             else:
                 print("Invalid index.")
         elif choice == "7":
+            index = int(input("Enter index of record to delete: "))
+            if manager.remove_record(index):
+                print("Record deleted.")
+            else:
+                print("Invalid index.")
+        elif choice == "8":
             break
         else:
             print("Invalid choice. Try again.")
