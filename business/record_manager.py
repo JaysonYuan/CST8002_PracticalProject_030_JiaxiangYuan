@@ -20,6 +20,12 @@ class RecordManager:
             return True
         return False
 
+    def update_record(self, index: int, new_record: Record):
+        if 0 <= index < len(self.records):
+            self.records[index] = new_record
+            return True
+        return False
+
     def get_all_records(self):
         return self.records
 
