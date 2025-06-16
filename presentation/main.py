@@ -1,6 +1,8 @@
 """
 presentation/main.py
 Command-line interface for interacting with the Sr-90 record system.
+
+Program by Jiaxiang Yuan
 """
 
 from business.record_manager import RecordManager
