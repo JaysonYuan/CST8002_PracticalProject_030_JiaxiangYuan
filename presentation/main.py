@@ -16,7 +16,9 @@ def display_menu():
     print("3. Search by province")
     print("4. Save records to new CSV")
     print("5. Add a new record")
-    print("6. Exit")
+    print("6. Edit a record")
+    print("7. Exit")
+
 
 
 def main():
@@ -64,9 +66,35 @@ def main():
             )
             manager.add_record(new_record)
             print("New record added.")
-        elif choice == "6":
-            break
+            elif choice == "6":
+            index = int(input("Enter index of record to edit: "))
+            if 0 <= index < len(manager.records):
+                r = manager.records[index]
+                print(f"Editing record [{index}]: {r}")
+                sample_type = input(f"Sample Type [{r.sample_type}]: ") or r.sample_type
+                type_ = input(f"Type [{r.type_}]: ") or r.type_
+                start_date = input(f"Start Date [{r.start_date}]: ") or r.start_date
+                stop_date = input(f"Stop Date [{r.stop_date}]: ") or r.stop_date
+                station_name = input(f"Station Name [{r.station_name}]: ") or r.station_name
+                province = input(f"Province [{r.province}]: ") or r.province
+                sr90_activity = input(f"Sr90 Activity [{r.sr90_activity}]: ") or r.sr90_activity
+                sr90_error = input(f"Sr90 Error [{r.sr90_error}]: ") or r.sr90_error
+                sr90_calcium_activity = input(f"Sr90 Calcium Activity [{r.sr90_calcium_activity}]: ") or r.sr90_calcium_activity
 
+                from model.record import Record
+                updated_record = Record(
+                    sample_type, type_, start_date, stop_date,
+                    station_name, province, sr90_activity,
+                    sr90_error, sr90_calcium_activity
+                )
+                if manager.update_record(index, updated_record):
+                    print("Record updated.")
+                else:
+                    print("Update failed.")
+            else:
+                print("Invalid index.")
+        elif choice == "7":
+            break
         else:
             print("Invalid choice. Try again.")
 
