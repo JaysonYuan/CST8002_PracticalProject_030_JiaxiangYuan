@@ -11,9 +11,12 @@ from model.record import Record
 
 class TestRecordManager(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        print("Program by Jiaxiang Yuan")
+
     def setUp(self):
         self.manager = RecordManager()
-        # Add initial record
         self.record1 = Record("Milk", "Type1", "2020-01-01", "2020-01-31",
                               "Station A", "ProvinceA", "10.5", "0.1", "5.0")
         self.manager.add_record(self.record1)
