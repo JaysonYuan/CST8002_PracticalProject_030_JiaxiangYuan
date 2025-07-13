@@ -1,0 +1,67 @@
+"""
+dataset_handler.py
+Parses milk dataset CSV and returns polymorphic RecordBase objects.
+
+Author: Jiaxiang Yuan
+"""
+
+import csv
+from typing import List
+from model.record_base import RecordBase
+from model.formatted_record_a import FormattedRecordA
+from model.formatted_record_b import FormattedRecordB
+
+def load_milk_dataset(file_path: str) -> List[RecordBase]:
+    """
+    Load the milk dataset from CSV and return a list of polymorphic record objects.
+
+    Alternates between FormattedRecordA and FormattedRecordB.
+
+    :param file_path: Path to the CSV dataset file.
+    :return: List of polymorphic RecordBase records.
+    """
+    records: List[RecordBase] = []
+
+    try:
+        with open(file_path, mode='r', encoding='utf-8-sig') as csvfile:
+            reader = csv.reader(csvfile)
+            headers = next(reader)  # Skip header row
+
+            for index, row in enumerate(reader):
+                if len(row) < 9:
+                    continue  # Skip rows with missing data
+
+                # Extract and parse relevant fields
+                station = row[4]
+                province = row[5]
+                start_date = row[2]
+                sr90_activity = try_float(row[6])
+
+                # Compose polymorphic fields
+                record_id = f"{index:03d}"
+                name = f"{station}-{province}-{start_date}"
+                value = sr90_activity
+
+                # Alternate between A and B for polymorphism
+                if index % 2 == 0:
+                    record = FormattedRecordA(record_id, name, value)
+                else:
+                    record = FormattedRecordB(record_id, name, value)
+
+                records.append(record)
+
+    except FileNotFoundError:
+        print(f"[ERROR] File not found: {file_path}")
+    except Exception as e:
+        print(f"[ERROR] Exception during loading: {e}")
+
+    return records
+
+def try_float(value: str) -> float:
+    """
+    Safely parse a float from string, returning 0.0 on failure.
+    """
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return 0.0
