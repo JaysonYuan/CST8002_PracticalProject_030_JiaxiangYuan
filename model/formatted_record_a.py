@@ -1,5 +1,5 @@
+# formatted_record_a.py
 """
-formatted_record_a.py
 Implements a dash-separated format for milk radiation records.
 
 Author: Jiaxiang Yuan
@@ -14,4 +14,5 @@ class FormattedRecordA(RecordBase):
     """
 
     def display(self) -> str:
-        return f"Record {self.id} - {self.name} - Sr90: {self.value:.5f} Bq/L"
+        # Format: "ID - name - value with 3 decimals"
+        return f"{self.id} - {self.name} - {self.value:.3f}"
