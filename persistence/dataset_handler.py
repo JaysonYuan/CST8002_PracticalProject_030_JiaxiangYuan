@@ -11,6 +11,15 @@ from model.record_base import RecordBase
 from model.formatted_record_a import FormattedRecordA
 from model.formatted_record_b import FormattedRecordB
 
+def try_float(value: str) -> float:
+    """
+    Safely parse a float from string, returning 0.0 on failure.
+    """
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return 0.0
+
 def load_milk_dataset(file_path: str) -> List[RecordBase]:
     """
     Load the milk dataset from CSV and return a list of polymorphic record objects.
@@ -28,7 +37,7 @@ def load_milk_dataset(file_path: str) -> List[RecordBase]:
             headers = next(reader)  # Skip header row
 
             for index, row in enumerate(reader):
-                if len(row) < 9:
+                if len(row) < 7:
                     continue  # Skip rows with missing data
 
                 # Extract and parse relevant fields
@@ -56,12 +65,3 @@ def load_milk_dataset(file_path: str) -> List[RecordBase]:
         print(f"[ERROR] Exception during loading: {e}")
 
     return records
-
-def try_float(value: str) -> float:
-    """
-    Safely parse a float from string, returning 0.0 on failure.
-    """
-    try:
-        return float(value)
-    except (ValueError, TypeError):
-        return 0.0
