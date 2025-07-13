@@ -32,16 +32,17 @@ def load_milk_dataset(file_path: str) -> List[RecordBase]:
     records: List[RecordBase] = []
 
     try:
-        with open(file_path, mode='r', encoding='utf-8-sig') as csvfile:
+        # Changed encoding to 'latin1' to avoid decode errors with special chars
+        with open(file_path, mode='r', encoding='latin1') as csvfile:
             reader = csv.reader(csvfile)
             headers = next(reader)  # Skip header row
 
             for index, row in enumerate(reader):
-                # Only use first 9 columns to avoid extra commas breaking parsing
+                # Use only first 9 columns to avoid parse errors due to extra commas
                 row = row[:9]
 
                 if len(row) < 7:
-                    # Skip rows with insufficient data for needed columns
+                    # Skip rows with insufficient data
                     continue
 
                 station = row[4].strip()
