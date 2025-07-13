@@ -13,6 +13,13 @@ class RecordBase(ABC):
     """
 
     def __init__(self, id: str, name: str, value: float):
+        """
+        Initialize the base record.
+
+        :param id: unique identifier for the record
+        :param name: concatenated string of station, province, and date
+        :param value: Sr90 activity value
+        """
         self.id = id
         self.name = name
         self.value = value
