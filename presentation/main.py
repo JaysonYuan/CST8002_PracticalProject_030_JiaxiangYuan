@@ -2,7 +2,7 @@ from model.formatted_record_a import FormattedRecordA
 from model.formatted_record_b import FormattedRecordB
 
 def display_menu():
-    print("Program by Jayson YUAN")
+    print("Program by Jiaxiang Yuan")
     print("Choose a display format:")
     print("1. Dash-separated")
     print("2. Label format")
