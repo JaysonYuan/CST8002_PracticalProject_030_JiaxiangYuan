@@ -24,4 +24,5 @@ class TestPolymorphicRecords(unittest.TestCase):
         self.assertEqual(rec.display(), expected)
 
 if __name__ == '__main__':
+    print("Unit test by Jiaxiang Yuan")
     unittest.main()
