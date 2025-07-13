@@ -1,15 +1,28 @@
-class RecordBase:
+# /model/record_base.py
+"""
+record_base.py
+Defines the base class for records to demonstrate polymorphism.
+
+Author: Jiaxiang Yuan
+"""
+
+from abc import ABC, abstractmethod
+
+class RecordBase(ABC):
     """
-    Base class for records, used to demonstrate polymorphism.
+    Abstract base class for records, used to demonstrate polymorphism.
     """
 
-    def __init__(self, id, name, value):
+    def __init__(self, id: str, name: str, value: float):
         self.id = id
         self.name = name
         self.value = value
 
-    def display(self):
+    @abstractmethod
+    def display(self) -> str:
         """
-        Abstract method to display a record.
+        Abstract method to return a string representation of the record.
+
+        :return: Formatted string.
         """
-        raise NotImplementedError("Subclasses must implement the display method")
+        pass
