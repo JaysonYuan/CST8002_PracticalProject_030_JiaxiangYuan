@@ -1,4 +1,3 @@
-# /model/record_base.py
 """
 record_base.py
 Defines the base class for records to demonstrate polymorphism.
