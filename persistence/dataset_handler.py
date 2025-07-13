@@ -13,7 +13,10 @@ from model.formatted_record_b import FormattedRecordB
 
 def try_float(value: str) -> float:
     """
-    Safely parse a float from string, returning 0.0 on failure.
+    Safely parse a float from a string. Returns 0.0 if conversion fails.
+
+    :param value: String representation of a numeric value
+    :return: Float value or 0.0 if conversion fails
     """
     try:
         return float(value)
@@ -22,27 +25,27 @@ def try_float(value: str) -> float:
 
 def load_milk_dataset(file_path: str) -> List[RecordBase]:
     """
-    Load the milk dataset from CSV and return a list of polymorphic record objects.
+    Load the milk dataset from a CSV file and return a list of polymorphic record objects.
 
-    Alternates between FormattedRecordA and FormattedRecordB.
+    Alternates between FormattedRecordA and FormattedRecordB to demonstrate polymorphism.
 
-    :param file_path: Path to the CSV dataset file.
-    :return: List of polymorphic RecordBase records.
+    :param file_path: Path to the CSV dataset file
+    :return: List of RecordBase (FormattedRecordA or FormattedRecordB) instances
     """
     records: List[RecordBase] = []
 
     try:
-        # Changed encoding to 'latin1' to avoid decode errors with special chars
+        # Use 'latin1' to support accented French characters
         with open(file_path, mode='r', encoding='latin1') as csvfile:
             reader = csv.reader(csvfile)
             headers = next(reader)  # Skip header row
 
             for index, row in enumerate(reader):
-                # Use only first 9 columns to avoid parse errors due to extra commas
+                # Only use first 9 columns to prevent extra commas from breaking the format
                 row = row[:9]
 
+                # Ensure the row contains at least the required columns
                 if len(row) < 7:
-                    # Skip rows with insufficient data
                     continue
 
                 station = row[4].strip()
@@ -50,10 +53,11 @@ def load_milk_dataset(file_path: str) -> List[RecordBase]:
                 start_date = row[2].strip()
                 sr90_activity = try_float(row[6])
 
-                record_id = f"{index:03d}"
+                record_id = f"{index:03d}"  # Zero-padded 3-digit ID
                 name = f"{station}-{province}-{start_date}"
                 value = sr90_activity
 
+                # Alternate between format A and B
                 if index % 2 == 0:
                     record = FormattedRecordA(record_id, name, value)
                 else:
