@@ -37,21 +37,22 @@ def load_milk_dataset(file_path: str) -> List[RecordBase]:
             headers = next(reader)  # Skip header row
 
             for index, row in enumerate(reader):
-                if len(row) < 7:
-                    continue  # Skip rows with missing data
+                # Only use first 9 columns to avoid extra commas breaking parsing
+                row = row[:9]
 
-                # Extract and parse relevant fields
-                station = row[4]
-                province = row[5]
-                start_date = row[2]
+                if len(row) < 7:
+                    # Skip rows with insufficient data for needed columns
+                    continue
+
+                station = row[4].strip()
+                province = row[5].strip()
+                start_date = row[2].strip()
                 sr90_activity = try_float(row[6])
 
-                # Compose polymorphic fields
                 record_id = f"{index:03d}"
                 name = f"{station}-{province}-{start_date}"
                 value = sr90_activity
 
-                # Alternate between A and B for polymorphism
                 if index % 2 == 0:
                     record = FormattedRecordA(record_id, name, value)
                 else:
