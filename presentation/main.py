@@ -1,15 +1,14 @@
-"""
-main.py
-CLI to demonstrate polymorphism using milk Sr90 dataset records.
-
-Author: Jiaxiang Yuan
-"""
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from model.formatted_record_a import FormattedRecordA
 from model.formatted_record_b import FormattedRecordB
 from persistence.dataset_handler import load_milk_dataset
 
-DATASET_PATH = "./dataset/nms_strontium90_milk_ssn_strontium90_lait.csv"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
+DATASET_PATH = os.path.join(PROJECT_ROOT, "dataset", "nms_strontium90_milk_ssn_strontium90_lait.csv")
 
 def display_menu():
     print("\n--- Milk Radiation Record Viewer ---")
@@ -21,21 +20,24 @@ def display_menu():
 
 def main():
     all_records = load_milk_dataset(DATASET_PATH)
+    print(f"[DEBUG] Loaded {len(all_records)} records.")  # Debug info
+
+    if not all_records:
+        print("[ERROR] No records loaded. Please check the dataset file.")
+        return
 
     while True:
         display_menu()
-        choice = input("Enter your choice: ")
+        choice = input("Enter your choice: ").strip()
 
         if choice == '1':
             print("\n--- Dash-separated Records ---")
             for record in all_records:
-                # Use FormattedRecordA to display all records in dash-separated format
                 print(FormattedRecordA(record.id, record.name, record.value).display())
 
         elif choice == '2':
             print("\n--- Label-style Records ---")
             for record in all_records:
-                # Use FormattedRecordB to display all records in label-style format
                 print(FormattedRecordB(record.id, record.name, record.value).display())
 
         elif choice == '3':
