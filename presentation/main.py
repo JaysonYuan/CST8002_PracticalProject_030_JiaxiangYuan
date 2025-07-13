@@ -29,14 +29,14 @@ def main():
         if choice == '1':
             print("\n--- Dash-separated Records ---")
             for record in all_records:
-                if isinstance(record, FormattedRecordA):
-                    print(record.display())
+                # Use FormattedRecordA to display all records in dash-separated format
+                print(FormattedRecordA(record.id, record.name, record.value).display())
 
         elif choice == '2':
             print("\n--- Label-style Records ---")
             for record in all_records:
-                if isinstance(record, FormattedRecordB):
-                    print(record.display())
+                # Use FormattedRecordB to display all records in label-style format
+                print(FormattedRecordB(record.id, record.name, record.value).display())
 
         elif choice == '3':
             print("\nThank you for using the program. Goodbye!")
