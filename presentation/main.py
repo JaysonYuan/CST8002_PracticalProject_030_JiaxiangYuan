@@ -1,55 +1,62 @@
 """
 main.py
-Milk Radiation Record Viewer CLI
-
+Entry point for the milk radiation analysis program.
 Author: Jiaxiang Yuan
 """
 
-from persistence import dataset_handler
+from persistence.dataset_handler import load_milk_dataset, get_raw_data
+from business.statistics_calculator import calculate_average_radiation
+from chart.pie_chart import generate_pie_chart
+
+DATASET_PATH = "data/milk_dataset.csv"
 
 def display_menu():
-    """
-    Displays the main CLI menu.
-    """
-    print("\n--- Milk Radiation Record Viewer ---")
-    print("Author: Jiaxiang Yuan")
-    print("Select an option:")
-    print("1. Display records (dash-separated)")
-    print("2. Display records (label-style)")
-    print("3. Add a new record")
-    print("4. Edit a record")
-    print("5. Delete a record")
-    print("6. Reload dataset")
-    print("7. Show Pie Chart") 
-    print("8. Exit")
+    print("\n=== Milk Radiation Analysis Menu ===")
+    print("1. Load dataset")
+    print("2. View average Sr-90 by province")
+    print("3. Show Pie Chart")
+    print("4. Exit")
+
+def load_data():
+    print("[INFO] Loading dataset...")
+    records = load_milk_dataset(DATASET_PATH)
+    if records:
+        print(f"[SUCCESS] Loaded {len(records)} records.")
+    else:
+        print("[WARNING] No records loaded.")
+
+def show_average_radiation():
+    print("[INFO] Calculating average radiation by province...")
+    records = load_milk_dataset(DATASET_PATH)
+    if not records:
+        print("[ERROR] No data loaded. Please load the dataset first.")
+        return
+
+    averages = calculate_average_radiation(records)
+    for province, avg in averages.items():
+        print(f"{province}: {avg:.4f} Bq/L")
+
+def show_pie_chart():
+    print("[INFO] Generating pie chart of radiation by province...")
+    data = get_raw_data()
+    generate_pie_chart(data)
 
 def main():
-    """
-    Main control loop for CLI program.
-    """
     while True:
         display_menu()
-        choice = input("Enter your choice: ")
+        choice = input("Enter your choice: ").strip()
 
         if choice == '1':
-            print("Displaying records (dash-separated)...")
+            load_data()
         elif choice == '2':
-            print("Displaying records (label-style)...")
+            show_average_radiation()
         elif choice == '3':
-            print("Adding new record...")
+            show_pie_chart()
         elif choice == '4':
-            print("Editing record...")
-        elif choice == '5':
-            print("Deleting record...")
-        elif choice == '6':
-            print("Reloading dataset...")
-        elif choice == '7':
-            print("Pie chart option selected.")  
-        elif choice == '8':
-            print("Exiting program.")
+            print("[EXIT] Goodbye!")
             break
         else:
-            print("Invalid choice. Please try again.")
+            print("[WARNING] Invalid choice. Please try again.")
 
 if __name__ == "__main__":
     main()
