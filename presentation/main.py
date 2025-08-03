@@ -1,62 +1,248 @@
 """
 main.py
-Entry point for the milk radiation analysis program.
+CLI to demonstrate polymorphism using milk Sr90 dataset records.
+Implements CRUD operations and dynamic formatting.
+
 Author: Jiaxiang Yuan
 """
 
-from persistence.dataset_handler import load_milk_dataset, get_raw_data
-from business.statistics_calculator import calculate_average_radiation
+import sys
+import os
+
+# Add project root to path for importing modules
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from model.formatted_record_a import FormattedRecordA
+from model.formatted_record_b import FormattedRecordB
+from persistence.dataset_handler import load_milk_dataset
+from persistence import dataset_handler
 from chart.pie_chart import generate_pie_chart
 
-DATASET_PATH = "data/milk_dataset.csv"
+# Define path to dataset
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
+DATASET_PATH = os.path.join(PROJECT_ROOT, "dataset", "nms_strontium90_milk_ssn_strontium90_lait.csv")
+
+# In-memory list of all records
+all_records = []
+next_id = 0  # Track next available ID for new records
+
 
 def display_menu():
-    print("\n=== Milk Radiation Analysis Menu ===")
-    print("1. Load dataset")
-    print("2. View average Sr-90 by province")
-    print("3. Show Pie Chart")
-    print("4. Exit")
+    """
+    Displays the main CLI menu.
+    """
+    print("\n--- Milk Radiation Record Viewer ---")
+    print("Author: Jiaxiang Yuan")
+    print("Select an option:")
+    print("1. Display records (dash-separated)")
+    print("2. Display records (label-style)")
+    print("3. Add a new record")
+    print("4. Edit a record")
+    print("5. Delete a record")
+    print("6. Reload dataset")
+    print("7. Show Pie Chart") 
+    print("8. Exit")
 
-def load_data():
-    print("[INFO] Loading dataset...")
-    records = load_milk_dataset(DATASET_PATH)
-    if records:
-        print(f"[SUCCESS] Loaded {len(records)} records.")
-    else:
-        print("[WARNING] No records loaded.")
 
-def show_average_radiation():
-    print("[INFO] Calculating average radiation by province...")
-    records = load_milk_dataset(DATASET_PATH)
-    if not records:
-        print("[ERROR] No data loaded. Please load the dataset first.")
+def display_records(format_type='dash'):
+    """
+    Displays all records in the selected format.
+    """
+    if not all_records:
+        print("[INFO] No records to display.")
         return
 
-    averages = calculate_average_radiation(records)
-    for province, avg in averages.items():
-        print(f"{province}: {avg:.4f} Bq/L")
+    print("\n--- Milk Radiation Records ---")
+    for idx, record in enumerate(all_records):
+        prefix = f"{idx}: "
+        if format_type == 'dash':
+            print(prefix + FormattedRecordA(record.id, record.name, record.value).display())
+        else:
+            print(prefix + FormattedRecordB(record.id, record.name, record.value).display())
+
+
+def generate_next_id():
+    """
+    Generates the next unique ID in padded 3-digit format.
+    """
+    global next_id
+    new_id = f"{next_id:03d}"
+    next_id += 1
+    return new_id
+
+
+def add_record():
+    """
+    Prompts user to input a new record and adds it to the list.
+    """
+    station = input("Enter station name: ").strip()
+    province = input("Enter province code: ").strip()
+    start_date = input("Enter start date (e.g. 01-Jan-90): ").strip()
+
+    try:
+        sr90 = float(input("Enter Sr90 activity (Bq/L): ").strip())
+    except ValueError:
+        print("[ERROR] Invalid numeric value.")
+        return
+
+    record_id = generate_next_id()
+    name = f"{station}-{province}-{start_date}"
+    record = FormattedRecordA(record_id, name, sr90)
+    all_records.append(record)
+    print(f"[INFO] Record {record_id} added.")
+
+
+def find_record_by_id(record_id):
+    """
+    Finds a record by ID.
+    """
+    for idx, rec in enumerate(all_records):
+        if rec.id == record_id:
+            return idx, rec
+    return None, None
+
+
+def edit_record():
+    """
+    Edits an existing record by ID.
+    """
+    record_id = input("Enter record ID to edit: ").strip()
+    idx, record = find_record_by_id(record_id)
+
+    if record is None:
+        print("[ERROR] Record not found.")
+        return
+
+    print(f"Editing record {record_id}:")
+    try:
+        station, province, start_date = record.name.split('-', 2)
+    except ValueError:
+        print("[WARN] Unexpected name format. Defaulting to empty values.")
+        station = province = start_date = ""
+
+    print(f"Current station: {station}")
+    new_station = input("New station (leave blank to keep): ").strip()
+    print(f"Current province: {province}")
+    new_province = input("New province (leave blank to keep): ").strip()
+    print(f"Current start date: {start_date}")
+    new_start_date = input("New start date (leave blank to keep): ").strip()
+    print(f"Current Sr90 activity: {record.value}")
+    new_value_str = input("New Sr90 activity (leave blank to keep): ").strip()
+
+    station = new_station if new_station else station
+    province = new_province if new_province else province
+    start_date = new_start_date if new_start_date else start_date
+    value = record.value
+
+    if new_value_str:
+        try:
+            value = float(new_value_str)
+        except ValueError:
+            print("[ERROR] Invalid number. Keeping original value.")
+
+    new_name = f"{station}-{province}-{start_date}"
+
+    if isinstance(record, FormattedRecordA):
+        new_record = FormattedRecordA(record.id, new_name, value)
+    else:
+        new_record = FormattedRecordB(record.id, new_name, value)
+
+    all_records[idx] = new_record
+    print(f"[INFO] Record {record_id} updated.")
+
+
+def delete_record():
+    """
+    Deletes a record by ID with confirmation.
+    """
+    record_id = input("Enter record ID to delete: ").strip()
+    idx, record = find_record_by_id(record_id)
+
+    if record is None:
+        print("[ERROR] Record not found.")
+        return
+
+    confirm = input(f"Are you sure you want to delete record {record_id}? (y/n): ").strip().lower()
+    if confirm == 'y':
+        all_records.pop(idx)
+        print(f"[INFO] Record {record_id} deleted.")
+    else:
+        print("[INFO] Deletion cancelled.")
+
+
+def reload_data():
+    """
+    Reloads the dataset from CSV and updates in-memory list.
+    """
+    global all_records, next_id
+    try:
+        all_records = load_milk_dataset(DATASET_PATH)
+    except FileNotFoundError:
+        print(f"[ERROR] Dataset file not found at {DATASET_PATH}")
+        all_records = []
+
+    if all_records:
+        max_id_num = max(int(r.id) for r in all_records if r.id.isdigit())
+        next_id = max_id_num + 1
+    else:
+        next_id = 0
+
+    print(f"[INFO] Reloaded {len(all_records)} records.")
+
 
 def show_pie_chart():
-    print("[INFO] Generating pie chart of radiation by province...")
-    data = get_raw_data()
-    generate_pie_chart(data)
+    """
+    Prompts user for a column and displays a pie chart of its values.
+    """
+    data = dataset_handler.get_raw_data()
+    if not data:
+        print("No data available.")
+        return
+
+    print("Available fields:")
+    for key in data[0].keys():
+        print(f"- {key}")
+    column = input("Enter column name to plot: ").strip().lower()
+
+    if column not in data[0]:
+        print("[ERROR] Invalid column name.")
+        return
+
+    generate_pie_chart(data, column)
+
 
 def main():
+    """
+    Entry point: starts CLI loop and handles user interaction.
+    """
+    reload_data()
+    print(f"[DEBUG] Loaded {len(all_records)} records.")
+
     while True:
         display_menu()
         choice = input("Enter your choice: ").strip()
 
         if choice == '1':
-            load_data()
+            display_records('dash')
         elif choice == '2':
-            show_average_radiation()
+            display_records('label')
         elif choice == '3':
-            show_pie_chart()
+            add_record()
         elif choice == '4':
-            print("[EXIT] Goodbye!")
+            edit_record()
+        elif choice == '5':
+            delete_record()
+        elif choice == '6':
+            reload_data()
+        elif choice == '7':
+            show_pie_chart()
+        elif choice == '8':
+            print("\nThank you for using the program. Goodbye!")
             break
         else:
-            print("[WARNING] Invalid choice. Please try again.")
+            print("[ERROR] Invalid choice. Please select again.")
+
 
 if __name__ == "__main__":
     main()
