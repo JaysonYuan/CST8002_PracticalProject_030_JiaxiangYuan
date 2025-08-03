@@ -14,8 +14,10 @@ def generate_pie_chart(data: list):
     
     Parameters:
         data (list): A list of dictionaries, each containing a 'province' key.
+        
+    Returns:
+        None. Displays a pie chart using matplotlib.
     """
-    # Count the number of records per province
     province_counts = defaultdict(int)
     for record in data:
         province = record.get("province", "Unknown")
@@ -24,7 +26,6 @@ def generate_pie_chart(data: list):
     labels = list(province_counts.keys())
     sizes = list(province_counts.values())
 
-    # Generate pie chart
     plt.figure(figsize=(8, 8))
     plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=140)
     plt.title("Milk Radiation Records by Province")
