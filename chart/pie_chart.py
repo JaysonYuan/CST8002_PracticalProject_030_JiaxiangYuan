@@ -1,17 +1,33 @@
+"""
+pie_chart.py
+Generate a pie chart based on milk radiation dataset by province.
+
+Author: Jiaxiang Yuan
+"""
 
 import matplotlib.pyplot as plt
-from collections import Counter
+from collections import defaultdict
 
-def generate_pie_chart(data, column):
-    values = [record[column] for record in data if column in record]
-    counts = Counter(values)
+def generate_pie_chart(data: list):
+    """
+    Generate a pie chart showing the number of records per province.
+    
+    Parameters:
+        data (list): A list of dictionaries, each containing a 'province' key.
+    """
+    # Count the number of records per province
+    province_counts = defaultdict(int)
+    for record in data:
+        province = record.get("province", "Unknown")
+        province_counts[province] += 1
 
-    labels = list(counts.keys())
-    sizes = list(counts.values())
+    labels = list(province_counts.keys())
+    sizes = list(province_counts.values())
 
-    plt.figure(figsize=(6,6))
+    # Generate pie chart
+    plt.figure(figsize=(8, 8))
     plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=140)
-    plt.title(f"Distribution of {column}")
+    plt.title("Milk Radiation Records by Province")
     plt.axis('equal')
-    plt.savefig(f"{column}_pie_chart.png")
+    plt.tight_layout()
     plt.show()
